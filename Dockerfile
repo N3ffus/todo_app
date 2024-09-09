@@ -8,6 +8,6 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
-CMD alembic upgrade head
+RUN alembic upgrade head
 
 CMD gunicorn -w 1 -k uvicorn.workers.UvicornWorker src.main:app
