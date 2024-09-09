@@ -8,4 +8,4 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
-CMD gunicorn main:app --workers 1 --worker-class Uvicorn.workers.UvicornWorker
+CMD gunicorn src.main:app
