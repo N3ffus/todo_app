@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>TodoApp</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/flowbite@2.5.1/dist/flowbite.min.css" rel="stylesheet"/>
+</head>
+<body>
+<header class="bg-white">
+    <nav class="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8" aria-label="Global">
+        <div class="flex lg:flex-1">
+            <a href="#" class="-m-1.5 p-1.5">
+
+                <a href="{{ url_for('main') }}" class="flex items-center text-3xl font-bold leading-6 text-gray-900">TodoApp</a>
+
+            </a>
+        </div>
+
+        <div class="py-6">
+            {% if username %}
+            <button id="dropdownNavbarLink" data-dropdown-toggle="dropdownNavbar"
+                    class="text-xl flex items-center justify-between w-full py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 md:w-auto dark:text-black md:dark:hover:text-blue-500 dark:focus:text-black dark:border-gray-700 dark:hover:bg-gray-700 md:dark:hover:bg-transparent">
+                {{ username }}
+                <svg class="w-2.5 h-2.5 ms-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                     viewBox="0 0 10 6">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="m1 1 4 4 4-4"/>
+                </svg>
+            </button>
+            <!-- Dropdown menu -->
+            <div id="dropdownNavbar" class="z-10 hidden font-normal bg-white  rounded-lg shadow w-44 dark:bg-gray-700 ">
+                <ul class=" text-sm text-gray-700 dark:text-gray-400" aria-labelledby="dropdownLargeButton">
+
+                    <div class="py-1">
+                        <a href="{{ url_for('exit') }}"
+                           class="block px-4 py-2 text-sm text-red-900 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-red-400 dark:hover:text-red">Выйти</a>
+                    </div>
+                </ul>
+            </div>
+            </li>
+
+
+            {% else %}
+            <a href="{{ url_for('login_page') }}"
+               class="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-indigo-100">Войти</a>
+            {% endif %}
+
+
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+</header>
+{% block content %}
+{% endblock %}
+
+<script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.1/dist/flowbite.min.js"></script>
+</body>
+</html>

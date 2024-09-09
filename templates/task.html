@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="text-center">
+    <form action="{{ url_for('update_task', task_id=task_id) }}" method="POST">
+
+        <div>
+            <label for="title" class="block text-xl font-medium leading-6 text-gray-900">Название</label>
+            <div class="relative mt-2 rounded-md  items-center pb-5">
+
+                <input type="text" name="title" id="title"
+                       class="mx-auto block w-1/3 rounded-md border-0 pb py-1.5 pl-5 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                       value="{{ title }}">
+            </div>
+
+
+            <label id="listbox-label" class="block text-xl font-medium leading-6 text-gray-900">Статус задачи</label>
+            <div class="relative mt-2 rounded-md  items-center pb-5">
+                <select name="task_status" id="large"
+                        class="mx-auto block w-1/3 rounded-md border-0 py-1.5 pl-5 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+
+                    <option {% if task_status== status.not_started %} selected {% endif %} value="0">Не начата</option>
+                    <option {% if task_status== status.in_progress %} selected {% endif %} value="1">В процессе</option>
+                    <option {% if task_status== status.completed %} selected {% endif %} value="2">Выполнена</option>
+
+                </select>
+
+
+            </div>
+            <label for="description" class="block text-xl font-medium leading-6 text-gray-900">Описание задачи</label>
+            <div class="relative mt-2 rounded-md shadow-sm items-center pb-10">
+
+                <textarea name="description" id="description" maxlength="4096" rows="12"
+                          class="mx-auto block w-1/3 rounded-md border-0 py-1.5 pl-5 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">{{ description }}</textarea>
+            </div>
+            <a href="/todos?page=1">
+                <button type="button"
+                        class="mx-auto inline-flex text-white  items-center bg-indigo-700 hover:bg-indigo-800 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800">
+                    Вернуться
+                </button>
+            </a>
+
+            <a href="{{ url_for('delete_task', task_id=task_id)}}">
+                <button type="button"
+                        class="mx-auto inline-flex text-white  items-center bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800">
+                    Удалить задачу
+                </button>
+            </a>
+
+            <button type="submit"
+                    class="mx-auto inline-flex text-white  items-center bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
+                Сохранить изменения
+            </button>
+
+    </form>
+</div>
+
+
+{% endblock %}

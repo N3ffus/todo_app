@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="relative mt-2 rounded-md text-center items-center pb-5">
+    {% if tasks %}
+    <form action="{{ url_for('get_tasks') }}" method="GET">
+        <select name="sorting" id="large"
+                class="inline-flex mx-auto block w-1/8 rounded-md border-0 py-1.5 pl-5 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+
+
+            <option {% if sorting== sorts.by_date %} selected {% endif %} value="0">По дате изменения</option>
+            <option {% if sorting== sorts.by_title %} selected {% endif %} value="1">По названию</option>
+            <option {% if sorting== sorts.by_status %} selected {% endif %} value="2">По статусу</option>
+
+        </select>
+        <button class="inline-flex block text-white bg-indigo-700 hover:bg-indigo-800 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-sm px-4 py-1.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800"
+                type="submit">
+            Применить
+        </button>
+    </form>
+    {% endif %}
+
+
+</div>
+
+
+{% if tasks %}
+<ul class=" mx-auto flex flex-row justify-center -space-x-px rounded-md ">
+    <li>
+        <a href="/todos?page={{ 1 }}&sorting={{ sorting.value }}"
+           class="relative hidden items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 md:inline-flex">Начало</a>
+    </li>
+    {% for page in pages %}
+    <li>
+        {% if page == current_page %}
+        <a href="/todos?page={{ page }}&sorting={{ sorting.value }}"
+           class="relative z-10 inline-flex items-center bg-indigo-600 px-4 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">{{
+            page }}</a>
+        {% else %}
+        <a href="/todos?page={{ page }}&sorting={{ sorting.value }}"
+           class="relative hidden items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 md:inline-flex">{{
+            page }}</a>
+        {% endif %}
+    </li>
+    {% endfor %}
+    <li>
+        <a href="/todos?page={{ last_page }}&sorting={{ sorting.value }}"
+           class="relative hidden items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 md:inline-flex">Конец</a>
+    </li>
+</ul>
+{% else %}
+<h1 class="mt-4 text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl text-center">Задач пока нет :(</h1>
+{% endif %}
+<ul class="bg-white shadow overflow-hidden sm:rounded-md max-w-sm mx-auto mt-16">
+    {% for task in tasks %}
+
+    {% if loop.first %}
+    <li>
+        {% else %}
+    <li class="border-t border-gray-200">
+        {% endif %}
+        <div class="px-4 py-5 sm:px-6">
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg leading-6 font-medium text-gray-900">{{ task.title }}</h3>
+                <p class="mt-1 max-w-2xl text-sm text-gray-500">{{ task.description | truncate(15, True)}}</p>
+            </div>
+            <div class="mt-4 flex items-center justify-between">
+                {% if task.status == status.not_started %}
+                <p class="text-sm font-medium text-gray-500">Статус: <span class="text-red-600">Не начата</span></p>
+                {% elif task.status == status.in_progress %}
+                <p class="text-sm font-medium text-gray-500">Статус: <span class="text-yellow-600">В процессе</span></p>
+                {% elif task.status == status.completed %}
+                <p class="text-sm font-medium text-gray-500">Статус: <span class="text-green-600">Выполнена</span></p>
+                {% endif %}
+                <a href="{{ url_for('get_task', task_id=task.id) }}">
+                    <button class="inline-flex block text-white bg-indigo-700 hover:bg-indigo-800 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-sm px-4 py-1.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800"
+                            type="button">
+                        Посмотреть
+                    </button>
+                </a>
+
+            </div>
+        </div>
+    </li>
+
+    {% endfor %}
+
+</ul>
+
+
+<!-- Modal toggle -->
+<button data-modal-target="crud-modal" data-modal-toggle="crud-modal"
+        class="mt-10 mb-10 flex mx-auto block text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+        type="button">
+    Новая задача
+</button>
+
+<!-- Main modal -->
+<div id="crud-modal" tabindex="-1" aria-hidden="true"
+     class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative p-4 w-full max-w-xl max-h-full">
+        <!-- Modal content -->
+        <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+            <!-- Modal header -->
+            <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                    Создание новой задачи
+                </h3>
+                <button type="button"
+                        class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                        data-modal-toggle="crud-modal">
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                         viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                    </svg>
+                    <span class="sr-only">Close modal</span>
+                </button>
+            </div>
+            <!-- Modal body -->
+            <form class="p-4 md:p-5" action="{{ url_for('create_task') }}" method="POST">
+                <div class="grid gap-4 mb-4 grid-cols-2">
+                    <div class="col-span-2">
+                        <label for="title"
+                               class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Название</label>
+                        <input type="text" name="title" id="title"
+                               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                               placeholder="Введите название задачи" required="">
+                    </div>
+
+                    <div class="col-span-2">
+                        <label for="description" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Описание
+                            задачи</label>
+                        <textarea name="description" id="description" maxlength="4096" rows="12"
+                                  class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                  placeholder="Напишите здесь описание задачи"></textarea>
+                    </div>
+                </div>
+                <button type="submit"
+                        class="mx-auto flex text-white  items-center bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
+                    <svg class="me-1 -ms-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20"
+                         xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd"
+                              d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                              clip-rule="evenodd"></path>
+                    </svg>
+                    Добавить новую задачу
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!--Edit modal-->
+<div id="edit-modal" tabindex="-1" aria-hidden="true"
+     class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative p-4 w-full max-w-xl max-h-full">
+        <!-- Modal content -->
+        <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+            <!-- Modal header -->
+            <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                    Просмотр задачи
+                </h3>
+                <button type="button"
+                        class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                        data-modal-toggle="crud-modal">
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                         viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                    </svg>
+                    <span class="sr-only">Close modal</span>
+                </button>
+            </div>
+            <!-- Modal body -->
+            <form class="p-4 md:p-5" action="{{ url_for('main') }}" method="GET">
+                <div class="grid gap-4 mb-4 grid-cols-2">
+                    <div class="col-span-2">
+                        <label for="title2" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Название</label>
+                        <input type="text" name="title" id="title2"
+                               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                               placeholder="Введите название задачи" required="">
+                    </div>
+
+                    <div class="col-span-2">
+                        <label for="description2" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Описание
+                            задачи</label>
+                        <textarea name="description" id="description2" maxlength="4096" rows="12"
+                                  class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                  placeholder="Напишите здесь описание задачи"></textarea>
+                    </div>
+                </div>
+                <button type="submit"
+                        class="mx-auto flex text-white  items-center bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
+                    <svg class="me-1 -ms-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20"
+                         xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd"
+                              d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                              clip-rule="evenodd"></path>
+                    </svg>
+                    Добавить новую задачу
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
